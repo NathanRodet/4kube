@@ -43,8 +43,14 @@ kubectl get logs <pods>
 
 ## Manage Flux with Helm Release
 
-Does not work : https://fluxcd.io/flux/guides/helmreleases/
+### Notes
+
+Does not work but here are my sources :
+https://fluxcd.io/flux/guides/helmreleases/
+https://github.com/fluxcd/flux2-kustomize-helm-example
 Follow the installation path depending your OS : https://fluxcd.io/flux/installation/
+
+Wouldn't it be easier in 3 hours to deploy using kustomizations envs files with patchs to resources ?
 
 ### Create Flux namespace
 
@@ -59,12 +65,3 @@ export GHUSER="NathanRodet"
 ```
 
 ### Launch flux
-
-```bash
-fluxctl install \
-  --git-user=${GHUSER}
-  --git-email=${GHUSER}@users.noreply.github.com
-  --git-url=git@github.com:${GHUSER}/supinfo-4kube
-  --git-path=namespaces,workloads
-  --namespace=flux | kubectl apply -k .
-```
