@@ -1,0 +1,13 @@
+# Helm Release
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prestashop-prod
+  namespace: prod
+  annotations:
+    fluxcd.io/automated: "true"
+spec:
+  releaseName: prestashop
+  chart:
+    git: git@github.com:NathanRodet/supinfo-4kube.git
+    path: prestashop
