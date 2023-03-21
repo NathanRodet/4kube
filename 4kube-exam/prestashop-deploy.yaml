@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: 4kube
+  name: deployment-prestashop
+  labels:
+    app: prestashop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prestashop
+  template:
+    metadata:
+      labels:
+        app: prestashop
+    spec:
+      containers:
+        - name: prestashop
+          image: bitnami/prestashop:1.7
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRESTASHOP_LAST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap
+                  key: PRESTASHOP_LAST_NAME
+            - name: PRESTASHOP_FIRST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap
+                  key: PRESTASHOP_FIRST_NAME
+            - name: PRESTASHOP_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_USER
+            - name: PRESTASHOP_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_NAME
+            - name: PRESTASHOP_DATABASE_HOST
+              value: service-mysql
+            - name: PRESTASHOP_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_PASSWORD
+          volumeMounts:
+            - name: prestashop-vol
+              mountPath: /bitnami/prestashop
+      volumes:
+        - name: prestashop-vol
+          persistentVolumeClaim:
+            claimName: prestapvc
+
+---
+# Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-prestashop
+  labels:
+    storage: prestashop
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /tmp/pv-prestashop
+    type: Directory
+  volumeMode: Filesystem
+
+---
+# Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: 4kube
+  name: prestapvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      storage: prestashop
+  volumeMode: Filesystem
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-prestashop
+  namespace: 4kube
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: http
+      nodePort: 30080
+  selector:
+    app: prestashop

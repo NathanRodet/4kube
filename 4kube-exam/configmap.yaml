@@ -1,0 +1,9 @@
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: 4kube
+  name: configmap
+data:
+  PRESTASHOP_FIRST_NAME: Nathan
+  PRESTASHOP_LAST_NAME: Rodet

@@ -1,0 +1,99 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: 4kube
+  name: deployment-mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: bitnami/mysql:8.0.32
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_NAME
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_PASSWORD
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: DATABASE_USER
+          volumeMounts:
+            - name: mysqlpvc
+              mountPath: /bitnami
+      volumes:
+        - name: mysqlpvc
+          persistentVolumeClaim:
+            claimName: mysqlpvc
+# Persistant Volume
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-mysql
+  labels:
+    storage: mysql
+
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /tmp/pv-mysql
+    type: Directory
+  volumeMode: Filesystem
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-mysql
+  namespace: 4kube
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+
+---
+# Persistant Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: 4kube
+  name: mysqlpvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      storage: mysql
+  volumeMode: Filesystem
