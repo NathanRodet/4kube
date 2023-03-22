@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: 4kube-prestashop
+  namespace: 4kube-helm
+spec:
+  interval: 5m
+  releaseName: helm-prestashop
+    chart: prestashop-helm
+    version: 'latest'
+    sourceRef:
+      kind: GitRepository
+      name: prestashop
+      namespace: flux-system
+      interval: 1m
+  values:
+    replicaCount: 1
