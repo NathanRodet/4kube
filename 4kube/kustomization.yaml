@@ -1,0 +1,19 @@
+# Kustomization
+resources:
+  # - secrets.yaml
+  # - configmap.yaml
+  # - prestashop-deploy.yaml
+  # - mysql-deploy.yaml
+  # - namespace.yaml
+
+  - base/namespace.yaml
+  - base/secrets.yaml
+  - base/configMap.yaml
+
+  - prestashop/prestashop-svc.yaml
+  - prestashop/prestashop-pvc.yaml
+  - prestashop/prestashop-deploy.yaml
+
+  - mysql/mysql-svc.yaml
+  - mysql/mysql-pvc.yaml
+  - mysql/mysql-deploy.yaml

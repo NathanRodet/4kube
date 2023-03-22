@@ -1,10 +1,10 @@
 # Exam 4kube
 
-## Launch project
+## Launch project without environment gesture
 
 ```bash
-# Create resources
-kubectl apply -k 4kube-exam
+# Create resources with environment gesture
+kubectl apply -k ./4kube
 # Expose web prestashop service
 minikube service service-prestashop -n 4kube --url
 ```
@@ -21,7 +21,31 @@ minikube service service-prestashop -n 4kube --url
 
 ```bash
 # Delete resources
-kubectl delete -k 4kube-exam
+kubectl delete -k ./4kube
+# Or force delete all resources to clean up
+kubectl delete all --all -n 4kube
+```
+
+## Deployment with environment gesture (Kustomize)
+
+With Kustomize, you can totally make patches in the base configuration code in the 4kube folder.
+
+So, you can adjust your deployment depending the needs of the environment.
+
+```bash
+# Create resources with environment gesture
+kubectl apply -k ./envs/local
+# Expose web prestashop service
+minikube service service-prestashop -n 4kube --url
+```
+
+### Delete project
+
+```bash
+# Delete resources
+kubectl delete -k ./envs/local
+# Or force delete all resources to clean up
+kubectl delete all --all -n 4kube
 ```
 
 ## Debug / Monitoring

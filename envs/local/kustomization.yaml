@@ -1,0 +1,4 @@
+# Kustomization Environement file
+
+bases:
+  - ../../4kube

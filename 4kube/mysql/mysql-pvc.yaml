@@ -1,0 +1,35 @@
+# Persistant Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-mysql
+  labels:
+    storage: mysql
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /tmp/pv-mysql
+    type: Directory
+  volumeMode: Filesystem
+
+---
+# Persistant Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: 4kube
+  name: mysqlpvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      storage: mysql
+  volumeMode: Filesystem
